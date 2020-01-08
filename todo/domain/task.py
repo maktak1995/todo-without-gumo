@@ -1,10 +1,36 @@
 import dataclasses
 import datetime
 import re
+import base64
+import uuid
 from typing import Optional
-from google.cloud import datastore
 
 from dataclass_type_validator import dataclass_type_validator
+
+
+@dataclasses.dataclass(frozen=True)
+class TaskKey:
+    _task_id: int
+    _kind: str = "Task"
+
+    @classmethod
+    def build_by_id(cls, task_id: int) -> "TaskKey":
+        if isinstance(task_id, str) and task_id.isdigit():
+            task_id = int(task_id)
+        return cls(_task_id=task_id)
+
+    @classmethod
+    def build_for_new(cls) -> "TaskKey":
+        return cls(_task_id=int(cls._generate_new_uuid()))
+
+    @classmethod
+    def _generate_new_uuid(cls) -> str:
+        s = base64.b32encode(uuid.uuid4().bytes).decode('utf-8')
+        return s.replace('======', '').lower()
+
+    @property
+    def task_id(self) -> int:
+        return self._task_id
 
 
 @dataclasses.dataclass(frozen=True)
@@ -28,7 +54,7 @@ class TaskName:  # TaskのKey構造と生成メソッドの定義
 
 @dataclasses.dataclass(frozen=True)
 class Task:
-    key: datastore.Key
+    key: TaskKey
     name: TaskName
     finished_at: Optional[datetime.datetime]
     created_at: datetime.datetime

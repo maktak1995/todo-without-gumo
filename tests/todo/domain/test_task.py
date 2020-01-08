@@ -1,19 +1,23 @@
 import datetime
 import pytest
 
-from google.cloud import datastore
 from dataclass_type_validator import TypeValidationError
 
-from todo.domain.task import Task, TaskName
+from todo.domain.task import Task, TaskKey, TaskName
 
 
-client = datastore.Client()
+class TestTaskKey:
+    def test_equal(self):
+        key1 = TaskKey.build_by_id(task_id=1)
+        key2 = TaskKey.build_by_id(task_id=1)
+        assert key1 == key2
+        assert key1.task_id == 1
 
 
 class TestTask:
     def test_build_successful(self):
         task = Task(
-            key=client.key("Task", id=1),
+            key=TaskKey.build_by_id(task_id=1),
             name=TaskName("Task Name"),
             finished_at=None,
             created_at=datetime.datetime(
@@ -28,7 +32,7 @@ class TestTask:
     def test_build_failure(self):
         with pytest.raises(expected_exception=TypeValidationError):
             Task(
-                key=client.key("Task", id=1),
+                key=TaskKey.build_by_id(task_id=1),
                 name='task name',
                 finished_at=None,
                 created_at=datetime.datetime(
