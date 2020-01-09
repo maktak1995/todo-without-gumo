@@ -3,14 +3,15 @@ import datetime
 import re
 import base64
 import uuid
-from typing import Optional
+from typing import Optional, Union
+from google.cloud import datastore
 
 from dataclass_type_validator import dataclass_type_validator
 
 
 @dataclasses.dataclass(frozen=True)
 class TaskKey:
-    _task_id: int
+    _task_id: Union[str, int]
     _kind: str = "Task"
 
     @classmethod
@@ -21,16 +22,29 @@ class TaskKey:
 
     @classmethod
     def build_for_new(cls) -> "TaskKey":
-        return cls(_task_id=int(cls._generate_new_uuid()))
+        return cls(_task_id=cls._generate_new_uuid())
 
     @classmethod
-    def _generate_new_uuid(cls) -> str:
-        s = base64.b32encode(uuid.uuid4().bytes).decode('utf-8')
+    def build_from_key(cls, key: datastore.key) -> "TaskKey":
+        if key.parent:
+            raise ValueError(f"key must not have parent")
+        if key.kind != cls._kind:
+            raise ValueError(f"key.KIND must equal to {cls._kind}: {key.kind}")
+
+        return cls.build_by_id(task_id=key.id_or_name)
+
+    @classmethod
+    def _generate_new_uuid(cls) -> Union[str, int]:
+        s: Union[str, int] = base64.b32encode(uuid.uuid4().bytes).decode('utf-8')
         return s.replace('======', '').lower()
 
     @property
     def task_id(self) -> int:
         return self._task_id
+
+    @property
+    def kind(self) -> str:
+        return self._kind
 
 
 @dataclasses.dataclass(frozen=True)

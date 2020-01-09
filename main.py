@@ -1,5 +1,10 @@
 import os
 import flask
+from injector import Injector
+from todo.bind import bind_todo
+
+injector = Injector([])
+injector.binder.install(bind_todo)
 
 app = flask.Flask(__name__)
 
