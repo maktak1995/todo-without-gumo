@@ -12,7 +12,7 @@ from dataclass_type_validator import dataclass_type_validator
 @dataclasses.dataclass(frozen=True)
 class TaskKey:
     _task_id: Union[str, int]
-    _kind: str = "Task"
+    KIND = "Task"
 
     @classmethod
     def build_by_id(cls, task_id: int) -> "TaskKey":
@@ -28,8 +28,8 @@ class TaskKey:
     def build_from_key(cls, key: datastore.key) -> "TaskKey":
         if key.parent:
             raise ValueError(f"key must not have parent")
-        if key.kind != cls._kind:
-            raise ValueError(f"key.KIND must equal to {cls._kind}: {key.kind}")
+        if key.kind != cls.KIND:
+            raise ValueError(f"key.KIND must equal to {cls.KIND}: {key.kind}")
 
         return cls.build_by_id(task_id=key.id_or_name)
 
@@ -41,10 +41,6 @@ class TaskKey:
     @property
     def task_id(self) -> int:
         return self._task_id
-
-    @property
-    def kind(self) -> str:
-        return self._kind
 
 
 @dataclasses.dataclass(frozen=True)

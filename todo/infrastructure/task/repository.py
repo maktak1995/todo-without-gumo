@@ -9,7 +9,7 @@ datastore_client = datastore.Client()
 
 class DatastoreTaskRepository(TaskRepository):
     def save(self, task: Task):
-        key = datastore_client.key(task.key.kind, task.key.task_id)
+        key = datastore_client.key(task.key.KIND, task.key.task_id)
         entity = datastore.Entity(key)
         entity.update({
             "name": task.name.value,
@@ -20,11 +20,11 @@ class DatastoreTaskRepository(TaskRepository):
         datastore_client.put(entity)
 
     def delete(self, key: TaskKey):
-        datastore_key = datastore_client.key(key.kind, key.task_id)
+        datastore_key = datastore_client.key(key.KIND, key.task_id)
         datastore_client.delete(datastore_key)
 
     def fetch_no_raise(self, key: TaskKey) -> typing.Optional[Task]:
-        datastore_key = datastore_client.key(key.kind, key.task_id)
+        datastore_key = datastore_client.key(key.KIND, key.task_id)
         doc = datastore_client.get(key=datastore_key)
         if doc is None:
             return None
@@ -41,7 +41,7 @@ class DatastoreTaskRepository(TaskRepository):
         )
 
     def fetch_list(self) -> typing.List[Task]:
-        query = datastore_client.query(kind=TaskKey.kind)
+        query = datastore_client.query(kind=TaskKey.KIND)
         tasks = [
             self._to_domain_entity(doc=doc)
             for doc in query.fetch()

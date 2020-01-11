@@ -9,7 +9,7 @@ datastore_client = datastore.Client()
 
 
 class TestTaskService:
-    KIND = "Task"
+    KIND = TaskKey.KIND
     repository: TaskRepository = main.injector.get(TaskRepository)
 
     def test_create_service(self):
