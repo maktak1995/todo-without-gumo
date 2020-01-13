@@ -4,6 +4,8 @@ from google.cloud import datastore
 from todo.application.task.repository import TaskRepository
 from todo.domain.task import Task, TaskKey, TaskName
 
+from todo.domain.project import ProjectKey
+
 datastore_client = datastore.Client()
 
 
@@ -11,8 +13,15 @@ class DatastoreTaskRepository(TaskRepository):
     def save(self, task: Task):
         key = datastore_client.key(task.key.KIND, task.key.task_id)
         entity = datastore.Entity(key)
+
+        if task.project_key is not None:
+            project_key = datastore_client.key(task.project_key.KIND, task.project_key.project_id)
+        else:
+            project_key = None
+
         entity.update({
             "name": task.name.value,
+            "project_key": project_key,
             "finished_at": task.finished_at,
             "created_at": task.created_at,
             "update_at": task.updated_at,
@@ -35,6 +44,8 @@ class DatastoreTaskRepository(TaskRepository):
         return Task(
             key=TaskKey.build_from_key(key=doc.key),
             name=TaskName(doc["name"]),
+            project_key=ProjectKey.build_from_key(key=doc["project_key"])
+            if doc["project_key"] is not None else doc["project_key"],
             finished_at=doc["finished_at"],
             created_at=doc["created_at"],
             updated_at=doc["update_at"],

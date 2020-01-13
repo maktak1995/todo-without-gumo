@@ -5,8 +5,9 @@ import base64
 import uuid
 from typing import Optional, Union
 from google.cloud import datastore
-
 from dataclass_type_validator import dataclass_type_validator
+
+from todo.domain.project import ProjectKey
 
 
 @dataclasses.dataclass(frozen=True)
@@ -66,6 +67,7 @@ class TaskName:  # TaskのKey構造と生成メソッドの定義
 class Task:
     key: TaskKey
     name: TaskName
+    project_key: Optional[ProjectKey]
     finished_at: Optional[datetime.datetime]
     created_at: datetime.datetime
     updated_at: datetime.datetime
@@ -83,6 +85,9 @@ class Task:
             updated_at=datetime.datetime.utcnow().astimezone(tz=datetime.timezone.utc),
             **changes
         )
+
+    def with_project_key(self, project_key: Optional[ProjectKey]) -> "Task":
+        return self._clone(project_key=project_key)
 
     def with_finished_at(self, finished_at: datetime.datetime) -> "Task":
         return self._clone(finished_at=finished_at)

@@ -5,6 +5,8 @@ from injector import inject
 from todo.application.task.repository import TaskRepository
 from todo.domain.task import Task, TaskKey, TaskName
 
+from todo.domain.project import ProjectKey
+
 
 class TaskCreateService:
     @inject
@@ -16,6 +18,7 @@ class TaskCreateService:
         task = Task(
             key=TaskKey.build_for_new(),
             name=TaskName(task_name),
+            project_key=None,
             finished_at=None,
             created_at=now,
             updated_at=now,
@@ -52,6 +55,26 @@ class TaskNameUpdateService:
     def execute(self, key: TaskKey, task_name: str) -> "Task":
         task = self._task_repository.fetch(key=key)
         modified_task = task.to_changed_task_name(task_name=TaskName(task_name))
+
+        self._task_repository.save(task=modified_task)
+
+        return modified_task
+
+
+class TaskProjectUpdateService:
+    @inject
+    def __init__(self, task_repository: TaskRepository):
+        self._task_repository = task_repository
+
+    def execute(self, key: TaskKey, project_id: str) -> "Task":
+        task = self._task_repository.fetch(key=key)
+
+        if project_id != "None":
+            project_key = ProjectKey.build_by_id(project_id)
+        else:
+            project_key = None
+
+        modified_task = task.with_project_key(project_key=project_key)
 
         self._task_repository.save(task=modified_task)
 

@@ -5,7 +5,6 @@ import base64
 import uuid
 from typing import Union
 from google.cloud import datastore
-
 from dataclass_type_validator import dataclass_type_validator
 
 
@@ -15,7 +14,7 @@ class ProjectKey:
     KIND = "Project"
 
     @classmethod
-    def build_by_id(cls, project_id: int) -> "ProjectKey":
+    def build_by_id(cls, project_id: Union[str, int]) -> "ProjectKey":
         if isinstance(project_id, str) and project_id.isdigit():
             project_id = int(project_id)
         return cls(_project_id=project_id)

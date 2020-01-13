@@ -21,6 +21,7 @@ class TestTaskRepository:
         task = Task(
             key=TaskKey.build_by_id(task_id=123),
             name=TaskName("Task Name"),
+            project_key=None,
             finished_at=None,
             created_at=datetime.datetime(2019, 12, 1, tzinfo=datetime.timezone.utc),
             updated_at=datetime.datetime(2019, 12, 1, tzinfo=datetime.timezone.utc),
@@ -37,6 +38,7 @@ class TestTaskRepository:
         task = Task(
             key=TaskKey.build_by_id(task_id=123),
             name=TaskName("Task Name"),
+            project_key=None,
             finished_at=None,
             created_at=datetime.datetime(2019, 12, 1, tzinfo=datetime.timezone.utc),
             updated_at=datetime.datetime(2019, 12, 1, tzinfo=datetime.timezone.utc),
