@@ -29,6 +29,7 @@
                 <input type="submit" value="delete">
             </form>
             <form action="/tasks/{{ task.key.task_id }}/update/status" method="post">
+                <input type="hidden" name="redirectTo" value="/tasks">
                 {% if task.is_finished %}
                     <input type="hidden" name="finished" value="false">
                     <input type="submit" value="undone">
